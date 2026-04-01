@@ -93,7 +93,7 @@ const ADMIN_PW = '2821';          // 원하는 비밀번호로 변경
         <div class="fg"><label class="fl">반 선택</label>
           <select class="fc" id="sCls">
             <option value="">반을 선택하세요</option>
-            <option>청운반</option><option>백운 A반</option><option>백운 B반</option><option>백운 C반</option><option>백운 D반</option>
+            <option>청운반</option><option>백운 A반</option><option>백운 B반</option><option>백운 C반</option><option>백운 D반</option><option>자습 4반</option>
           </select>
         </div>
         <div class="fg"><label class="fl">이름</label><input class="fc" id="sNm" type="text" placeholder="본인 이름을 입력하세요" maxlength="10"></div>
@@ -109,7 +109,7 @@ const ADMIN_PW = '2821';          // 원하는 비밀번호로 변경
         <div class="fg"><label class="fl">반 선택</label>
           <select class="fc" id="rCls">
             <option value="">반을 선택하세요</option>
-            <option>청운반</option><option>백운 A반</option><option>백운 B반</option><option>백운 C반</option><option>백운 D반</option>
+            <option>청운반</option><option>백운 A반</option><option>백운 B반</option><option>백운 C반</option><option>백운 D반</option><option>자습 4반</option>
           </select>
         </div>
         <div class="fg"><label class="fl">이름</label><input class="fc" id="rNm" type="text" placeholder="본인 이름을 입력하세요" maxlength="10"></div>
@@ -171,6 +171,7 @@ const ADMIN_PW = '2821';          // 원하는 비밀번호로 변경
           <button class="chip" data-cls="백운 B반" onclick="setF(this)">백운 B반</button>
           <button class="chip" data-cls="백운 C반" onclick="setF(this)">백운 C반</button>
           <button class="chip" data-cls="백운 D반" onclick="setF(this)">백운 D반</button>
+          <button class="chip" data-cls="자습 4반" onclick="setF(this)">자습 4반</button>
         </div>
         <div style="display:flex;gap:8px;margin-bottom:12px">
           <button class="btn btn-s btn-sm" style="flex:1;display:flex;align-items:center;justify-content:center;gap:5px" onclick="doBulk('승인')">
@@ -599,7 +600,7 @@ async function doApply() {
   if (!nm)  return toast('이름을 입력해 주세요.', 'e');
   if (!ct)  return toast('강의 과목 및 내용을 입력해 주세요.', 'e');
   if (BLK)  return toast('금일은 인터넷 강의 청강이 불가능합니다.', 'e');
-  if (!isReqTime() && !FORCE) return toast('신청 시간이 아닙니다. (매일 18:00 ~ 19:00)<br>조회 및 취소는 언제든 가능합니다.', 'e');
+  if (!isReqTime() && !FORCE) return toast('신청 시간이 아닙니다. (매일 18:00 ~ 19:00)\n조회 및 취소는 언제든 가능합니다.', 'e');
 
   btnLd('apBtn', true);
   try {
@@ -959,7 +960,7 @@ function buildResultText(list) {
   const appr = list.filter(r => r.status === '승인').length;
   const rej  = list.filter(r => r.status === '거절').length;
   const pend = list.filter(r => r.status === '대기').length;
-  const ORDER = ['청운반','백운 A반','백운 B반','백운 C반','백운 D반'];
+  const ORDER = ['청운반','백운 A반','백운 B반','백운 C반','백운 D반','자습 4반'];
   const grp = {};
   ORDER.forEach(c => grp[c] = []);
   list.forEach(r => { if (!grp[r.class_name]) grp[r.class_name] = []; grp[r.class_name].push(r); });
