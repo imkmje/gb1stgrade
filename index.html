@@ -73,6 +73,7 @@ const ADMIN_PW = '2821';          // 원하는 비밀번호로 변경
 
   <!-- 학생 탭 -->
   <div class="tab-pane active" id="tp-s">
+    <div id="noticeBnr"></div>
     <div id="blkBnr"></div>
     <div class="sub-tabs" id="subWrap">
       <div class="sub-pill">
@@ -155,7 +156,14 @@ const ADMIN_PW = '2821';          // 원하는 비밀번호로 변경
         </div>
       </div>
       <div class="card">
-        <div class="ctitle">금일 신청 현황</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <div class="ctitle" style="margin-bottom:0">신청 현황</div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <button class="btn btn-g btn-sm" onclick="admDateShift(-1)" style="padding:6px 10px;font-size:13px">←</button>
+            <span id="admDateLabel" style="font-size:12px;font-weight:700;color:var(--ink-3);min-width:80px;text-align:center"></span>
+            <button class="btn btn-g btn-sm" id="admDateNext" onclick="admDateShift(1)" style="padding:6px 10px;font-size:13px">→</button>
+          </div>
+        </div>
         <div class="sum-grid">
           <div class="sum-item"><div class="sum-n cb" id="sT">-</div><div class="sum-l">전체</div></div>
           <div class="sum-item"><div class="sum-n ca" id="sP">-</div><div class="sum-l">대기</div></div>
@@ -171,15 +179,24 @@ const ADMIN_PW = '2821';          // 원하는 비밀번호로 변경
           <button class="chip" data-cls="백운 D반" onclick="setF(this)">백운 D반</button>
           <button class="chip" data-cls="자습 4반" onclick="setF(this)">자습 4반</button>
         </div>
-        <div style="display:flex;gap:8px;margin-bottom:12px">
+        <div style="display:flex;gap:8px;margin-bottom:8px">
           <button class="btn btn-s btn-sm" style="flex:1;display:flex;align-items:center;justify-content:center;gap:5px" onclick="doBulk('승인')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg>선택 일괄 승인
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg>선택 승인
           </button>
           <button class="btn btn-d btn-sm" style="flex:1;display:flex;align-items:center;justify-content:center;gap:5px" onclick="doBulk('거절')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>선택 일괄 거절
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>선택 거절
+          </button>
+        </div>
+        <div style="margin-bottom:12px">
+          <button class="btn btn-s btn-sm btn-full" style="display:flex;align-items:center;justify-content:center;gap:5px" onclick="doApproveAll()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg>대기 중 전체 승인
           </button>
         </div>
         <div class="req-list" id="rqList"><div class="skel" style="height:90px"></div><div class="skel" style="height:90px;margin-top:10px"></div></div>
+      </div>
+      <div class="card" id="statCard" style="display:none">
+        <div class="ctitle">오늘 통계</div>
+        <div id="statBody" style="font-size:13px;color:var(--ink-2);line-height:1.8"></div>
       </div>
       <div class="card">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
@@ -189,6 +206,18 @@ const ADMIN_PW = '2821';          // 원하는 비밀번호로 변경
           </button>
         </div>
         <div style="overflow-x:auto"><table class="atbl"><thead><tr><th>#</th><th>반</th><th>이름</th><th>총신청</th><th>총승인</th><th>최근</th></tr></thead><tbody id="accBdy"></tbody></table></div>
+      </div>
+      <div class="card">
+        <div class="ctitle">공지사항</div>
+        <div class="fg" style="margin-bottom:8px">
+          <textarea class="fc" id="noticeInput" rows="2" placeholder="학생 화면 상단에 표시할 공지를 입력하세요..."></textarea>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-p btn-sm" style="flex:1;display:flex;align-items:center;justify-content:center;gap:5px" onclick="saveNotice()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>저장
+          </button>
+          <button class="btn btn-g btn-sm" style="flex:1;display:flex;align-items:center;justify-content:center;gap:5px" onclick="clearNotice()">지우기</button>
+        </div>
       </div>
       <div class="card" style="margin-bottom:0">
         <button class="btn btn-p btn-full" onclick="openResult()" style="display:flex;align-items:center;justify-content:center;gap:8px">
@@ -211,7 +240,7 @@ const ADMIN_PW = '2821';          // 원하는 비밀번호로 변경
           <svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
           개발자 도구
         </div>
-        <span style="font-size:11px;font-weight:700;color:var(--ink-4);background:var(--bg-deep);padding:2px 10px;border-radius:999px">v1.0.0</span>
+        <span style="font-size:11px;font-weight:700;color:var(--ink-4);background:var(--bg-deep);padding:2px 10px;border-radius:999px">v1.1.0</span>
       </div>
       <div class="rsh-sub">관리자 전용 디버그 패널</div>
     </div>
@@ -273,6 +302,18 @@ const ADMIN_PW = '2821';          // 원하는 비밀번호로 변경
           <div style="font-size:11px;color:var(--ink-3);margin-top:3px">저장된 STU_CLS, STU_NM 삭제</div>
         </div>
         <button class="btn btn-g btn-sm" onclick="devClearCache()">초기화</button>
+      </div>
+
+      <!-- 누적 현황 리셋 -->
+      <div style="background:var(--bg-deep);box-shadow:var(--sh-pressed);border-radius:var(--r);padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:12px">
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:6px">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            누적 현황 학기 리셋
+          </div>
+          <div style="font-size:11px;color:var(--ink-3);margin-top:3px">accum 테이블 전체 삭제</div>
+        </div>
+        <button class="btn btn-d btn-sm" onclick="devResetAccum()">리셋</button>
       </div>
 
       <!-- 섹션: 앱 정보 -->
@@ -444,7 +485,7 @@ function ico(k, sz=16) {
 // ──────────────────────────────────────────
 //  상태
 // ──────────────────────────────────────────
-let ADM = false, BLK = false, FORCE = false, FLT = '전체', MCB = null;
+let ADM = false, BLK = false, FORCE = false, FLT = '전체', MCB = null, ADM_DATE_OFFSET = 0;
 var DEV_TIME_OPEN = false, DEV_DATE_OFFSET = 0;
 
 // ──────────────────────────────────────────
@@ -454,6 +495,10 @@ var DEV_TIME_OPEN = false, DEV_DATE_OFFSET = 0;
   tick();
   setInterval(tick, 1000);
   chkBlk();
+  // 관리자 세션 복원
+  if (sessionStorage.getItem('ADM_SESSION') === '1') {
+    setTimeout(() => { switchMain('a'); doLogin(ADMIN_PW); }, 100);
+  }
   // 반/이름 자동 복원
   const savedCls = localStorage.getItem('STU_CLS');
   const savedNm  = localStorage.getItem('STU_NM');
@@ -489,7 +534,15 @@ function renderTimeBnr(ok) {
     const cur = now.getHours();
     // 18시 이전이면 "오늘 18:00부터", 19시 이후면 "내일 18:00부터"
     const nextMsg = cur < 18 ? '오늘 18:00부터 신청 가능합니다.' : '내일 18:00부터 신청 가능합니다.';
-    b.innerHTML = `<div style="padding:12px 20px 0"><div class="card" style="background:var(--surface);margin-bottom:0"><div style="display:flex;align-items:center;gap:12px;padding:4px 0"><div style="width:36px;height:36px;background:var(--surface);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--ink-3);flex-shrink:0">${ico('clock',18)}</div><div><div style="font-size:14px;font-weight:800;color:var(--ink)">지금은 신청 시간이 아닙니다</div><div style="font-size:12px;color:var(--ink-3);margin-top:2px">${nextMsg}</div></div></div></div></div>`;
+    // 카운트다운 계산
+    const target = new Date(now);
+    if (cur < 18) { target.setHours(18, 0, 0, 0); }
+    else { target.setDate(target.getDate() + 1); target.setHours(18, 0, 0, 0); }
+    const diff = Math.max(0, Math.floor((target - now) / 1000));
+    const hh = String(Math.floor(diff / 3600)).padStart(2,'0');
+    const mm = String(Math.floor((diff % 3600) / 60)).padStart(2,'0');
+    const ss = String(diff % 60).padStart(2,'0');
+    b.innerHTML = `<div style="padding:12px 20px 0"><div class="card" style="background:var(--surface);margin-bottom:0"><div style="display:flex;align-items:center;gap:12px;padding:4px 0"><div style="width:36px;height:36px;background:var(--bg-deep);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--ink-3);flex-shrink:0">${ico('clock',18)}</div><div style="flex:1"><div style="font-size:14px;font-weight:800;color:var(--ink)">지금은 신청 시간이 아닙니다</div><div style="font-size:12px;color:var(--ink-3);margin-top:2px">${nextMsg}</div></div><div style="font-size:16px;font-weight:800;color:var(--blue);font-variant-numeric:tabular-nums;letter-spacing:.02em">${hh}:${mm}:${ss}</div></div></div></div>`;
   }
 }
 
@@ -500,8 +553,16 @@ function switchMain(t) {
     document.getElementById('tp-'+x).classList.toggle('active', x === t);
     document.getElementById('bN-'+x).classList.toggle('active', x === t);
   });
-  if (t === 's') chkBlk();
-  if (t === 'a' && ADM) { loadReqs(); loadAcc(); }
+  if (t === 's') { chkBlk(); stopAutoRefresh(); }
+  if (t === 'a' && ADM) { loadReqs(); loadAcc(); startAutoRefresh(); }
+}
+let _autoRefreshTimer = null;
+function startAutoRefresh() {
+  stopAutoRefresh();
+  _autoRefreshTimer = setInterval(() => { if (ADM) { loadReqs(); } }, 30000);
+}
+function stopAutoRefresh() {
+  if (_autoRefreshTimer) { clearInterval(_autoRefreshTimer); _autoRefreshTimer = null; }
 }
 function switchSub(s) {
   ['ap','rs'].forEach(x => {
@@ -520,6 +581,31 @@ async function getSetting(key) {
     const data = await SB.get(`settings?key=eq.${key}&select=value`);
     return data && data.length ? data[0].value : null;
   } catch { return null; }
+}
+async function loadNotice() {
+  try {
+    const rows = await SB.get("settings?key=eq.NOTICE&select=value");
+    const txt = rows && rows.length ? rows[0].value : '';
+    const b = document.getElementById('noticeBnr');
+    if (!b) return;
+    if (txt) {
+      b.innerHTML = `<div style="padding:12px 20px 0"><div class="card" style="background:var(--blue-dim);margin-bottom:0"><div style="display:flex;align-items:flex-start;gap:10px;padding:2px 0"><div style="color:var(--blue);flex-shrink:0;margin-top:1px">${ico('info',16)}</div><div style="font-size:13px;font-weight:600;color:var(--ink);line-height:1.5">${txt}</div></div></div></div>`;
+    } else {
+      b.innerHTML = '';
+    }
+  } catch(e) {}
+}
+async function saveNotice() {
+  const txt = document.getElementById('noticeInput').value.trim();
+  await setSetting('NOTICE', txt);
+  toast(txt ? '공지가 저장됐습니다.' : '공지가 삭제됐습니다.', 's');
+  loadNotice();
+}
+async function clearNotice() {
+  document.getElementById('noticeInput').value = '';
+  await setSetting('NOTICE', '');
+  toast('공지가 삭제됐습니다.', 'w');
+  loadNotice();
 }
 async function setSetting(key, value) {
   await fetch(`${SUPABASE_URL}/rest/v1/settings?on_conflict=key`, {
@@ -544,6 +630,7 @@ async function chkBlk() {
     }
   } catch(e) { console.error('settings load error', e); }
   renderBnr();
+  loadNotice();
 }
 function renderBnr() {
   const b = document.getElementById('blkBnr');
@@ -710,7 +797,26 @@ function doCheckRes() {
   runRes(cls, nm);
 }
 
+let _pollTimer = null;
+function startPolling(cls, nm) {
+  stopPolling();
+  _pollTimer = setInterval(() => silentRes(cls, nm), 30000);
+}
+function stopPolling() {
+  if (_pollTimer) { clearInterval(_pollTimer); _pollTimer = null; }
+}
+async function silentRes(cls, nm) {
+  try {
+    const [rows, acc] = await Promise.all([
+      SB.get(`requests?date=eq.${today()}&class_name=eq.${encodeURIComponent(cls)}&name=eq.${encodeURIComponent(nm)}&select=*`),
+      getAccum(cls, nm)
+    ]);
+    const d = document.getElementById('resD');
+    if (d) renderRes(rows && rows.length ? rows[0] : null, acc, cls, nm, d);
+  } catch(e) {}
+}
 async function runRes(cls, nm) {
+  stopPolling();
   const d = document.getElementById('resD');
   d.innerHTML = `<div class="skel" style="height:130px;margin-top:4px"></div>`;
   try {
@@ -719,6 +825,7 @@ async function runRes(cls, nm) {
       getAccum(cls, nm)
     ]);
     renderRes(rows && rows.length ? rows[0] : null, acc, cls, nm, d);
+    startPolling(cls, nm);
   } catch(e) {
     d.innerHTML = `<div class="empty">${ico('warn',32)}<div>조회 오류: ${e.message}</div></div>`;
   }
@@ -749,11 +856,12 @@ function renderRes(req, acc, cls, nm, d) {
 // ──────────────────────────────────────────
 //  관리자: 로그인
 // ──────────────────────────────────────────
-function doLogin() {
-  const pw = document.getElementById('admPw').value;
+function doLogin(pw) {
+  pw = pw || document.getElementById('admPw').value;
   if (!pw) return toast('비밀번호를 입력해 주세요.', 'e');
   if (pw !== ADMIN_PW) return toast('비밀번호가 틀렸습니다.', 'e');
   ADM = true;
+  sessionStorage.setItem('ADM_SESSION', '1');
   document.getElementById('admLgn').style.display = 'none';
   document.getElementById('admPnl').style.display = 'block';
   loadBlkSt();
@@ -764,9 +872,14 @@ function doLogin() {
 // ──────────────────────────────────────────
 //  관리자: 불허 토글
 // ──────────────────────────────────────────
-function loadBlkSt() {
+async function loadBlkSt() {
   document.getElementById('blkTog').checked = BLK;
   document.getElementById('forceTog').checked = FORCE;
+  try {
+    const rows = await SB.get("settings?key=eq.NOTICE&select=value");
+    const txt = rows && rows.length ? rows[0].value : '';
+    document.getElementById('noticeInput').value = txt;
+  } catch(e) {}
 }
 function doForceToggle() {
   const chk = document.getElementById('forceTog'), want = chk.checked;
@@ -806,6 +919,24 @@ function doBlockToggle() {
 // ──────────────────────────────────────────
 //  관리자: 신청 목록
 // ──────────────────────────────────────────
+function admDate() {
+  const d = new Date();
+  d.setDate(d.getDate() + ADM_DATE_OFFSET);
+  return d.toLocaleDateString('sv-SE', { timeZone: 'Asia/Seoul' });
+}
+function admDateShift(dir) {
+  ADM_DATE_OFFSET += dir;
+  if (ADM_DATE_OFFSET > 0) ADM_DATE_OFFSET = 0; // 미래는 안 됨
+  updateAdmDateLabel();
+  loadReqs();
+}
+function updateAdmDateLabel() {
+  const el = document.getElementById('admDateLabel');
+  const nextBtn = document.getElementById('admDateNext');
+  if (!el) return;
+  el.textContent = ADM_DATE_OFFSET === 0 ? '오늘' : admDate().slice(5).replace('-', '/');
+  if (nextBtn) nextBtn.disabled = ADM_DATE_OFFSET >= 0;
+}
 function setF(el) {
   document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
   el.classList.add('active');
@@ -816,9 +947,10 @@ function setF(el) {
 async function loadReqs() {
   document.getElementById('rqList').innerHTML = `<div class="skel" style="height:90px"></div><div class="skel" style="height:90px;margin-top:10px"></div>`;
   try {
-    let qs = `requests?date=eq.${today()}&select=*&order=req_time.asc`;
+    updateAdmDateLabel();
+    let qs = `requests?date=eq.${admDate()}&select=*&order=req_time.asc`;
     if (FLT && FLT !== '전체') qs += `&class_name=eq.${encodeURIComponent(FLT)}`;
-    const allRows = await SB.get(`requests?date=eq.${today()}&select=status`);
+    const allRows = await SB.get(`requests?date=eq.${admDate()}&select=status`);
     const list = await SB.get(qs);
 
     const all = allRows || [];
@@ -837,6 +969,7 @@ async function loadReqs() {
 }
 
 function renderReqs(list) {
+  updateStats(list);
   const el = document.getElementById('rqList');
   if (!list.length) { el.innerHTML = `<div class="empty">${ico('inbox',36)}<div>금일 신청 내역이 없습니다.</div></div>`; return; }
   const BH = {
@@ -898,6 +1031,46 @@ function pRej(id, cls, nm) {
   });
 }
 
+function updateStats(list) {
+  const card = document.getElementById('statCard');
+  const body = document.getElementById('statBody');
+  if (!card || !body || !list.length) { if(card) card.style.display='none'; return; }
+  card.style.display = 'block';
+  // 과목별 집계
+  const subjectMap = {};
+  list.forEach(r => {
+    const subj = r.content.split('/')[0].trim();
+    subjectMap[subj] = (subjectMap[subj] || 0) + 1;
+  });
+  const top = Object.entries(subjectMap).sort((a,b) => b[1]-a[1]).slice(0,3);
+  // 반별 집계
+  const clsMap = {};
+  list.forEach(r => { clsMap[r.class_name] = (clsMap[r.class_name] || 0) + 1; });
+  const clsList = Object.entries(clsMap).sort((a,b) => b[1]-a[1]);
+  body.innerHTML = `
+    <div style="margin-bottom:8px"><span style="font-weight:700;color:var(--ink)">인기 과목</span><br>${top.map(([s,n]) => `${s} <span style="color:var(--blue);font-weight:700">${n}명</span>`).join(' · ')}</div>
+    <div><span style="font-weight:700;color:var(--ink)">반별 신청</span><br>${clsList.map(([c,n]) => `${c} <span style="color:var(--blue);font-weight:700">${n}명</span>`).join(' · ')}</div>
+  `;
+}
+async function doApproveAll() {
+  const pendingIds = [...document.querySelectorAll('.rchk')].map(e => e.dataset.id);
+  // 대기 중인 것만 필터
+  const rows = await SB.get(`requests?date=eq.${admDate()}&status=eq.대기&select=id,class_name,name`);
+  if (!rows || !rows.length) return toast('대기 중인 신청이 없습니다.', 'w');
+  mOpen({
+    title: `대기 중 전체 승인`,
+    body: `대기 중인 ${rows.length}건을 모두 승인합니다.`,
+    okText: '전체 승인', okCls: 'btn-s',
+    onOk: async () => {
+      for (const r of rows) {
+        await SB.patch(`requests?id=eq.${r.id}`, { status: '승인', proc_time: nowTime() });
+        await upsertAccum(r.class_name, r.name, 0, 1);
+      }
+      toast(`${rows.length}건 전체 승인됐습니다.`, 's');
+      loadReqs(); loadAcc();
+    }
+  });
+}
 async function doBulk(action) {
   const ids = [...document.querySelectorAll('.rchk:checked')].map(e => e.dataset.id);
   if (!ids.length) return toast('선택된 항목이 없습니다.', 'w');
@@ -1134,6 +1307,23 @@ function devClearRequests() {
   });
 }
 
+// 누적 현황 학기 리셋
+function devResetAccum() {
+  mOpen({
+    title: '누적 현황 학기 리셋',
+    body: 'accum 테이블의 모든 데이터를 삭제합니다.
+새 학기 시작 시에만 사용하세요.
+이 작업은 되돌릴 수 없습니다.',
+    okText: '리셋', okCls: 'btn-d',
+    onOk: async () => {
+      try {
+        await SB.del('accum?id=gt.0');
+        toast('누적 현황이 초기화됐습니다.', 's');
+        if (ADM) loadAcc();
+      } catch(e) { toast('오류: ' + e.message, 'e'); }
+    }
+  });
+}
 // 반/이름 캐시 초기화
 function devClearCache() {
   localStorage.removeItem('STU_CLS');
