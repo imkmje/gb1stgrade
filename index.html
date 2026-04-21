@@ -492,7 +492,7 @@ function renderTimeBnr(ok) {
     const cur = now.getHours();
     // 18시 이전이면 "오늘 18:00부터", 19시 이후면 "내일 18:00부터"
     const nextMsg = cur < 18 ? '오늘 18:00부터 신청 가능합니다.' : '내일 18:00부터 신청 가능합니다.';
-    b.innerHTML = `<div style="padding:12px 20px 0"><div class="card" style="background:var(--bg-deep);box-shadow:var(--sh-pressed);margin-bottom:0"><div style="display:flex;align-items:center;gap:12px;padding:4px 0"><div style="width:36px;height:36px;background:var(--surface);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--ink-3);flex-shrink:0">${ico('clock',18)}</div><div><div style="font-size:14px;font-weight:800;color:var(--ink)">지금은 신청 시간이 아닙니다</div><div style="font-size:12px;color:var(--ink-3);margin-top:2px">${nextMsg}</div></div></div></div></div>`;
+    b.innerHTML = `<div style="padding:12px 20px 0"><div class="card" style="background:var(--surface);margin-bottom:0"><div style="display:flex;align-items:center;gap:12px;padding:4px 0"><div style="width:36px;height:36px;background:var(--surface);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--ink-3);flex-shrink:0">${ico('clock',18)}</div><div><div style="font-size:14px;font-weight:800;color:var(--ink)">지금은 신청 시간이 아닙니다</div><div style="font-size:12px;color:var(--ink-3);margin-top:2px">${nextMsg}</div></div></div></div></div>`;
   }
 }
 
