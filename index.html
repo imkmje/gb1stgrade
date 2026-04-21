@@ -1,15 +1,14 @@
 <!DOCTYPE html>
-<html lang="ko" data-theme="light">
+<html lang="ko">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="color-scheme" content="light only">
 <title>강북고 온라인 학습실 사용 승인 시스템</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#e8eaef;--bg-deep:#dddfe6;--surface:#f2f4f8;--surface-hi:#fafbfc;--ink:#1a1c22;--ink-2:#424550;--ink-3:#7e8394;--ink-4:#b4b8c6;--blue:#3b7df8;--blue-dim:rgba(59,125,248,.13);--green:#1faa6e;--green-dim:rgba(31,170,110,.13);--red:#e5484d;--red-dim:rgba(229,72,77,.12);--amber:#d97706;--amber-dim:rgba(217,119,6,.12);--sh-xs:0 1px 2px rgba(0,0,0,.07);--sh-sm:0 1px 3px rgba(0,0,0,.06),0 4px 10px rgba(0,0,0,.06);--sh-md:0 2px 4px rgba(0,0,0,.05),0 8px 24px rgba(0,0,0,.08),0 0 0 1px rgba(255,255,255,.75) inset,0 1px 0 rgba(255,255,255,.95) inset;--sh-lg:0 4px 8px rgba(0,0,0,.06),0 20px 48px rgba(0,0,0,.10),0 0 0 1px rgba(255,255,255,.65) inset,0 1px 0 rgba(255,255,255,.95) inset;--sh-pressed:0 1px 2px rgba(0,0,0,.08),0 0 0 1px rgba(0,0,0,.05) inset,0 2px 8px rgba(0,0,0,.12) inset;--sh-blue:0 4px 16px rgba(59,125,248,.38),0 1px 0 rgba(255,255,255,.25) inset;--sh-green:0 4px 16px rgba(31,170,110,.34),0 1px 0 rgba(255,255,255,.2) inset;--sh-red:0 4px 16px rgba(229,72,77,.34),0 1px 0 rgba(255,255,255,.2) inset;--sh-amber:0 4px 16px rgba(217,119,6,.30),0 1px 0 rgba(255,255,255,.2) inset;--r-sm:10px;--r:16px;--r-lg:22px;--r-xl:28px;--rp:999px;--spring:cubic-bezier(.34,1.56,.64,1);--ease:cubic-bezier(.16,1,.3,1);--fast:150ms;--normal:250ms;--slow:400ms;--font:'Noto Sans KR',-apple-system,sans-serif}
-html[data-theme="dark"]{--bg:#12141a;--bg-deep:#0d0f14;--surface:#1e2028;--surface-hi:#252830;--ink:#f0f2f8;--ink-2:#b8bccf;--ink-3:#6b7086;--ink-4:#3e4257;--sh-md:0 2px 4px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.4),0 0 0 1px rgba(255,255,255,.06) inset,0 1px 0 rgba(255,255,255,.10) inset;--sh-lg:0 4px 8px rgba(0,0,0,.4),0 20px 48px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.05) inset,0 1px 0 rgba(255,255,255,.08) inset;--sh-pressed:0 1px 2px rgba(0,0,0,.4),0 0 0 1px rgba(0,0,0,.3) inset,0 2px 8px rgba(0,0,0,.4) inset}
+@media (prefers-color-scheme: dark) { :root {--bg:#12141a;--bg-deep:#0d0f14;--surface:#1e2028;--surface-hi:#252830;--ink:#f0f2f8;--ink-2:#b8bccf;--ink-3:#6b7086;--ink-4:#3e4257;--sh-md:0 2px 4px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.4),0 0 0 1px rgba(255,255,255,.06) inset,0 1px 0 rgba(255,255,255,.10) inset;--sh-lg:0 4px 8px rgba(0,0,0,.4),0 20px 48px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.05) inset,0 1px 0 rgba(255,255,255,.08) inset;--sh-pressed:0 1px 2px rgba(0,0,0,.4),0 0 0 1px rgba(0,0,0,.3) inset,0 2px 8px rgba(0,0,0,.4) inset}}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{font-size:16px;-webkit-tap-highlight-color:transparent}
 body{font-family:var(--font);background:var(--bg);color:var(--ink);padding-bottom:100px;word-break:keep-all;overflow-x:hidden;transition:background var(--slow) var(--ease),color var(--slow) var(--ease)}
@@ -68,9 +67,7 @@ const ADMIN_PW = '2821';          // 원하는 비밀번호로 변경
         <span class="hdr-name">심야 자율학습 온라인 학습실 사용 신청</span>
         <div class="hdr-time"><span class="tdot" id="tdot"></span><span id="hT"></span></div>
       </div>
-      <button class="btn-theme" onclick="toggleTheme()">
-        <svg id="thIco" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-      </button>
+
     </div>
   </div>
 
@@ -454,7 +451,6 @@ var DEV_TIME_OPEN = false, DEV_DATE_OFFSET = 0;
 //  초기화
 // ──────────────────────────────────────────
 (function init() {
-  if (localStorage.getItem('cdui-theme') === 'dark') applyDark(true, false);
   tick();
   setInterval(tick, 1000);
   chkBlk();
@@ -497,14 +493,7 @@ function renderTimeBnr(ok) {
   }
 }
 
-function applyDark(d, save=true) {
-  document.documentElement.setAttribute('data-theme', d ? 'dark' : 'light');
-  document.getElementById('thIco').innerHTML = d
-    ? `<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>`
-    : `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>`;
-  if (save) localStorage.setItem('cdui-theme', d ? 'dark' : 'light');
-}
-function toggleTheme() { applyDark(document.documentElement.getAttribute('data-theme') !== 'dark'); }
+
 
 function switchMain(t) {
   ['s','a'].forEach(x => {
@@ -1235,9 +1224,9 @@ let currentTheme = 'default';
 
 function devSetTheme(name) {
   currentTheme = name;
-  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
   const t = THEMES[name];
   if (!t) return;
+  const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
   const vars = isDark && t.dark ? { ...t.light, ...t.dark } : t.light;
   const root = document.documentElement;
   Object.entries(vars).forEach(([k, v]) => root.style.setProperty(k, v));
