@@ -1311,9 +1311,7 @@ function devClearRequests() {
 function devResetAccum() {
   mOpen({
     title: '누적 현황 학기 리셋',
-    body: 'accum 테이블의 모든 데이터를 삭제합니다.
-새 학기 시작 시에만 사용하세요.
-이 작업은 되돌릴 수 없습니다.',
+    body: 'accum 테이블의 모든 데이터를 삭제합니다.\n새 학기 시작 시에만 사용하세요.\n이 작업은 되돌릴 수 없습니다.',
     okText: '리셋', okCls: 'btn-d',
     onOk: async () => {
       try {
