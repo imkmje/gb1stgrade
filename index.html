@@ -74,6 +74,7 @@ const ADMIN_PW = '2821';          // 원하는 비밀번호로 변경
   <!-- 학생 탭 -->
   <div class="tab-pane active" id="tp-s">
     <div id="noticeBnr"></div>
+    <div id="capacityBnr"></div>
     <div id="blkBnr"></div>
     <div class="sub-tabs" id="subWrap">
       <div class="sub-pill">
@@ -319,6 +320,19 @@ const ADMIN_PW = '2821';          // 원하는 비밀번호로 변경
       <!-- 섹션: 앱 정보 -->
       <div style="font-size:10px;font-weight:700;color:var(--ink-4);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px">앱 정보</div>
 
+      <!-- 최대 인원 설정 -->
+      <div style="background:var(--bg-deep);box-shadow:var(--sh-pressed);border-radius:var(--r);padding:14px 16px;margin-bottom:8px">
+        <div style="font-size:13px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:6px;margin-bottom:10px">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          최대 신청 인원 설정
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input class="fc" id="devCapacityInput" type="number" min="1" max="100" placeholder="15" style="flex:1;padding:9px 12px;font-size:14px">
+          <button class="btn btn-p btn-sm" onclick="devSaveCapacity()" style="white-space:nowrap">저장</button>
+        </div>
+        <div style="font-size:11px;color:var(--ink-3);margin-top:8px">현재: <span id="devCapacityNow" style="font-weight:700;color:var(--ink)"></span>명 · 오늘 신청: <span id="devCapacityCur" style="font-weight:700;color:var(--blue)"></span>명</div>
+      </div>
+
       <!-- Supabase 연결 상태 -->
       <div style="background:var(--bg-deep);box-shadow:var(--sh-pressed);border-radius:var(--r);padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:12px">
         <div>
@@ -486,6 +500,7 @@ function ico(k, sz=16) {
 //  상태
 // ──────────────────────────────────────────
 let ADM = false, BLK = false, FORCE = false, FLT = '전체', MCB = null, ADM_DATE_OFFSET = 0;
+let MAX_CAPACITY = 15, CUR_COUNT = 0;
 var DEV_TIME_OPEN = false, DEV_DATE_OFFSET = 0;
 
 // ──────────────────────────────────────────
@@ -582,6 +597,34 @@ async function getSetting(key) {
     return data && data.length ? data[0].value : null;
   } catch { return null; }
 }
+async function loadCapacity() {
+  try {
+    const rows = await SB.get(`requests?date=eq.${today()}&select=id`);
+    CUR_COUNT = rows ? rows.length : 0;
+    renderCapacityBnr();
+  } catch(e) { console.error('capacity error', e); }
+}
+function renderCapacityBnr() {
+  const b = document.getElementById('capacityBnr');
+  if (!b) return;
+  const pct = Math.min(100, Math.round((CUR_COUNT / MAX_CAPACITY) * 100));
+  const full = CUR_COUNT >= MAX_CAPACITY;
+  const barColor = full ? 'var(--red)' : pct >= 80 ? 'var(--amber)' : 'var(--blue)';
+  b.innerHTML = `<div style="padding:12px 20px 0"><div class="card" style="margin-bottom:0;padding:14px 16px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <div style="font-size:12px;font-weight:700;color:var(--ink-2);display:flex;align-items:center;gap:5px">
+        ${ico('inbox',14)} 오늘 신청 현황
+      </div>
+      <div style="font-size:16px;font-weight:800;color:${full ? 'var(--red)' : 'var(--ink)'}">
+        ${CUR_COUNT}<span style="font-size:12px;font-weight:600;color:var(--ink-3)"> / ${MAX_CAPACITY}명</span>
+      </div>
+    </div>
+    <div style="height:6px;background:var(--bg-deep);border-radius:99px;overflow:hidden">
+      <div style="height:100%;width:${pct}%;background:${barColor};border-radius:99px;transition:width .4s ease"></div>
+    </div>
+    ${full ? `<div style="margin-top:8px;font-size:11px;font-weight:700;color:var(--red);text-align:center">정원이 마감됐습니다.</div>` : `<div style="margin-top:6px;font-size:10px;color:var(--ink-4);text-align:right">${MAX_CAPACITY - CUR_COUNT}명 남음</div>`}
+  </div></div>`;
+}
 async function loadNotice() {
   try {
     const rows = await SB.get("settings?key=eq.NOTICE&select=value");
@@ -627,10 +670,12 @@ async function chkBlk() {
       const m = Object.fromEntries(rows.map(r => [r.key, r.value]));
       BLK   = m['BLOCK_DATE'] === today();
       FORCE = m['FORCE_ACCEPT'] === 'true';
+      MAX_CAPACITY = parseInt(m['MAX_CAPACITY']) || 15;
     }
   } catch(e) { console.error('settings load error', e); }
   renderBnr();
   loadNotice();
+  await loadCapacity();
 }
 function renderBnr() {
   const b = document.getElementById('blkBnr');
@@ -693,6 +738,7 @@ async function doApply() {
   if (!nm)  return toast('이름을 입력해 주세요.', 'e');
   if (!ct)  return toast('강의 과목 및 내용을 입력해 주세요.', 'e');
   if (BLK)  return toast('금일은 인터넷 강의 청강이 불가능합니다.', 'e');
+  if (CUR_COUNT >= MAX_CAPACITY) return toast('정원이 마감됐습니다. 더 이상 신청할 수 없습니다.', 'e');
   if (!isReqTime() && !FORCE) return toast('신청 시간이 아닙니다. (매일 18:00 ~ 19:00)\n조회 및 취소는 언제든 가능합니다.', 'e');
 
   btnLd('apBtn', true);
@@ -717,6 +763,8 @@ async function doApply() {
     });
     // 누적 신청 +1
     await upsertAccum(cls, nm, 1, 0);
+    CUR_COUNT++;
+    renderCapacityBnr();
     localStorage.setItem('STU_CLS', cls);
     localStorage.setItem('STU_NM', nm);
     toast('신청이 완료됐습니다!', 's');
@@ -765,6 +813,8 @@ async function doCancel(cls, nm) {
     if (rows[0].status !== '대기') return toast('이미 처리된 신청은 취소할 수 없습니다.', 'e');
     await SB.del(`requests?id=eq.${rows[0].id}`);
     await upsertAccum(cls, nm, -1, 0);
+    CUR_COUNT = Math.max(0, CUR_COUNT - 1);
+    renderCapacityBnr();
     toast('신청이 취소됐습니다.', 'w');
     document.getElementById('resD').innerHTML = '';
   } catch(e) { toast('오류: ' + e.message, 'e'); }
@@ -1271,6 +1321,12 @@ function devOpen() {
   document.getElementById('devDateCur').textContent = today();
   document.getElementById('devBg').classList.add('show');
   devUpdateThemeBtns();
+  const capNow = document.getElementById('devCapacityNow');
+  const capCur = document.getElementById('devCapacityCur');
+  const capIn = document.getElementById('devCapacityInput');
+  if (capNow) capNow.textContent = MAX_CAPACITY;
+  if (capCur) capCur.textContent = CUR_COUNT;
+  if (capIn) capIn.value = MAX_CAPACITY;
 }
 function devClose() {
   document.getElementById('devBg').classList.remove('show');
@@ -1307,6 +1363,17 @@ function devClearRequests() {
   });
 }
 
+// 최대 인원 저장
+async function devSaveCapacity() {
+  const val = parseInt(document.getElementById('devCapacityInput').value);
+  if (!val || val < 1 || val > 200) return toast('1~200 사이 숫자를 입력해 주세요.', 'e');
+  await setSetting('MAX_CAPACITY', String(val));
+  MAX_CAPACITY = val;
+  renderCapacityBnr();
+  const capNow = document.getElementById('devCapacityNow');
+  if (capNow) capNow.textContent = MAX_CAPACITY;
+  toast(`최대 인원이 ${val}명으로 설정됐습니다.`, 's');
+}
 // 누적 현황 학기 리셋
 function devResetAccum() {
   mOpen({
